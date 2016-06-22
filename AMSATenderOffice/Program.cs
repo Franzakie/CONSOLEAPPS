@@ -8,7 +8,9 @@ using BusinessClass.List;
 using BusinessClass.SAP;
 using BusinessClass.Static;
 using System.Diagnostics;
-
+//Tender Office
+//Franz Seidel
+//2016-06-22
 namespace AMSATenderOffice
 {
     class Program
@@ -18,15 +20,9 @@ namespace AMSATenderOffice
             classStatic.CreateLog("Application Started on :" + DateTime.Now.ToString());
             try
             {
-                CokeAndCOrder saveThisCokeOrder;
-                CokeAndChemicalsList myList = new CokeAndChemicalsList();
-                foreach (CokeAndCOrder myCokeOrder in myList)
-                {
-                    saveThisCokeOrder = classSAP.GetCokeAndCOrderInfo(myCokeOrder);
-                    myCokeOrder.IsDirty = true;
-                    saveThisCokeOrder.Save();
-                    classStatic.AppendLog("Sap Order Number: " + myCokeOrder.DeliveryNo + ", Trailer Number: " + myCokeOrder.TrailerNr);
-                }
+                RFQ myRFQ = new RFQ();
+                myRFQ.GetLastRFQ();
+                List<RFQ>  myRFQList = classSAP.GetRFQList(myRFQ.ToString());
             }
             catch (Exception err)
             {
