@@ -9,33 +9,24 @@ using BusinessClass.SAP;
 using BusinessClass.Static;
 using System.Diagnostics;
 using System.Configuration;
-using BusinessClass.List;
 
-//Tender Office
-//Franz Seidel
-//2016-06-22
-namespace AMSATenderOffice
+namespace COTBCMTOCRM
 {
     class Program
     {
         static void Main(string[] args)
         {
+//            MailConstructor.CreateGMail("This is some obscure message in the body");
+
             classStatic.CreateLog("Application Started on :" + DateTime.Now.ToString());
             try
             {
-                RFQ myRFQ = new RFQ();
-                myRFQ.GetLastRFQ();
-                classSAP.GetRFQList(myRFQ.ToString());
-                RFQList MyRFQList = new RFQList();
-                foreach(RFQ myRfq in MyRFQList)
+                CallList myCalls = new CallList();
+                foreach (Call myCall in myCalls)
                 {
-                    myRFQ.GetReturnInfo(Properties.Settings.Default.CategoryName, Properties.Settings.Default.AttribName1, Properties.Settings.Default.AttribName2, Properties.Settings.Default.AttribName3, Properties.Settings.Default.AttribName4);
+                    myCall.BCMStatus = "IARECFOUND";
+                    classSAP.GetCotIARecord(myCall);
                 }
-                //sort list with returned info
-                var queryReturnedRFQs = from rfq in MyRFQList
-                                        where rfq.Status != ""
-                                        select rfq;
-                //classSAP.RFQUpdate((RFQList)queryReturnedRFQs);
             }
             catch (Exception err)
             {

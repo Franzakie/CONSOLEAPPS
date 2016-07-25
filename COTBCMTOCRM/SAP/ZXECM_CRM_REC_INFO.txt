@@ -1,0 +1,53 @@
+FUNCTION zxecm_crm_rec_info.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  IMPORTING
+*"     VALUE(IV_BCM_ID) TYPE  ZADTEL00001J
+*"  EXPORTING
+*"     VALUE(EV_INT_REC_ID) TYPE  CRMT_OBJECT_ID_DB
+*"     VALUE(EV_INT_REC_GUID) TYPE  CRMT_OBJECT_GUID
+*"     VALUE(EV_SERV_ID) TYPE  CRMT_OBJECT_ID_DB
+*"     VALUE(EV_SERV_GUID) TYPE  CRMT_OBJECT_GUID
+*"----------------------------------------------------------------------
+  DATA: lt_doc_flow TYPE crmt_doc_flow_wrkt,
+        ls_guid     TYPE crmt_object_guid,
+        lt_guid     TYPE crmt_object_guid_tab.
+
+  FIELD-SYMBOLS <fs_flow> TYPE crmt_doc_flow_wrk.
+
+  CONSTANTS: lc_bus2000126 TYPE swo_objtyp VALUE 'BUS2000126',
+             lc_bus2000223 TYPE swo_objtyp VALUE 'BUS2000223'.
+
+  CLEAR: ev_int_rec_id, ev_int_rec_guid, ev_serv_id, ev_serv_guid, ls_guid.
+  FREE: lt_guid, lt_doc_flow.
+* get interaction record guid
+  SELECT SINGLE guid object_id FROM crmd_orderadm_h INTO (ev_int_rec_guid, ev_int_rec_id)
+                    WHERE zzbcm_call_id EQ iv_bcm_id.
+
+  IF ev_int_rec_guid IS NOT INITIAL.
+    ls_guid = ev_int_rec_guid.
+    APPEND ls_guid TO lt_guid.
+* Now get the
+    CALL FUNCTION 'CRM_ORDER_READ'
+      EXPORTING
+        it_header_guid   = lt_guid
+        iv_no_auth_check = abap_true
+      IMPORTING
+        et_doc_flow      = lt_doc_flow
+      EXCEPTIONS
+        OTHERS           = 1.                                 "#EC *
+
+* Get the service request
+    LOOP AT lt_doc_flow ASSIGNING <fs_flow> WHERE ref_guid = ev_int_rec_guid
+                                              AND objtype_a = lc_bus2000126
+                                              AND objtype_b = lc_bus2000223.
+      ev_serv_guid = <fs_flow>-objkey_b.
+    ENDLOOP.
+
+    UNASSIGN <fs_flow>.
+* Get service request object id
+    SELECT SINGLE object_id FROM crmd_orderadm_h INTO ev_serv_id
+                           WHERE guid = ev_serv_guid.
+
+  ENDIF.
+ENDFUNCTION.

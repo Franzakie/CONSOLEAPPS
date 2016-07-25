@@ -1,31 +1,76 @@
-create or replace PROCEDURE TEMP_UPDATE_TC_NUM
+create or replace PROCEDURE AMSA_RFQ_R_ALL
+                   (cv_1                OUT SYS_REFCURSOR)
 AS
-    Tmp_CattName      varchar2(50) := 'Test Certificate';  
-    Tmp_ATTName       varchar2(50) := 'Test Certificate Number';  
-    Tmp_DocId         varchar2(50);
-    Tmp_TCNR          varchar2(50);
-  CURSOR CaC_Cursor IS 
-  SELECT TC.DOCID, 
-    TC.TC_NR
-  FROM V_TC_SCAN@tcp TC
-  where TC.DOCID = 'alp133ppwltfcjozkjwrzp33bd14e'; 
---  WHERE TC.DOCID IS NOT NULL;;
 BEGIN
-   OPEN  CaC_Cursor;
-   LOOP
-      BEGIN
-          FETCH CaC_Cursor 
-          INTO  Tmp_DocId, Tmp_TCNR;
-          EXIT WHEN CaC_Cursor%NOTFOUND;
-          IF LENGTH(Tmp_TCNR) > 0 THEN Temp_AMSA_CS_GENERIC_U(Tmp_DocId, Tmp_CattName, Tmp_ATTName, Tmp_TCNR); END IF; 
-      END;
-   END LOOP;
-   CLOSE CaC_Cursor;
-   COMMIT;
+	OPEN cv_1 FOR
+	SELECT ID, RFQNO, RFQ_GROUPNO, OURREF, DESCRIPTION, 
+		CLOSINGDATE, VENDORNO, VENDORNAME, BUYERNO, BUYERNAME, 
+		LOCATIONNO, "LOCATION", UPDATEDINSAP
+	FROM AMSA_RFQ
+	WHERE UPDATEDINSAP = 0;
 END;
 
-EXECUTE TEMP_UPDATE_TC_NUM;
-SELECT * FROM DTREE WHERE NAME = 'alp133ppwltfcjozkjwrzp33bd14e';
+
+create or replace PROCEDURE AMSA_CS_RFQ_DOCID_R(v_DOCID           IN NVARCHAR2
+												,v_CategoryName 	IN NVARCHAR2
+												,v_AttribName1  	IN NVARCHAR2
+												,v_AttribName2  	IN NVARCHAR2
+												,v_AttribName3  	IN NVARCHAR2
+												,v_AttribName4  	IN NVARCHAR2
+												,cv_1           	OUT SYS_REFCURSOR)
+IS
+  v_ID              NUMBER(19,0);
+  Str_AttribNo      NVARCHAR2(10);
+  Str_Value1        NVARCHAR2(50);
+  Str_Value2        NVARCHAR2(50);
+  Str_Value3        NVARCHAR2(50);
+  Str_Value4        NVARCHAR2(50);
+BEGIN
+    Str_Value1 := '';
+    Str_Value2 := '';
+    Str_Value3 := '';
+    Str_Value4 := '';
+    v_ID := 0;
+	SELECT DATAID INTO v_ID FROM DTREECORE WHERE NAME = v_DOCID; 
+	IF v_ID > 0 THEN
+		Str_AttribNo := '0';
+		SELECT substr(ci.REGIONNAME, (INSTRC(ci.REGIONNAME,'_',1,2)+1)) INTO Str_AttribNo FROM CATREGIONMAP ci
+		WHERE ci.CATNAME = v_CategoryName AND ci.AttrName = v_AttribName1;
+		IF TO_NUMBER(Str_AttribNo) > 0 THEN
+			SELECT VALSTR INTO Str_Value1 FROM LLATTRDATA WHERE ID = v_ID AND ATTRID = TO_NUMBER(Str_AttribNo)
+			AND VERNUM = (SELECT MAX(VERNUM) FROM LLATTRDATA WHERE ID = v_ID );
+			COMMIT;
+		END IF;
+		Str_AttribNo := '0';
+		SELECT substr(ci.REGIONNAME, (INSTRC(ci.REGIONNAME,'_',1,2)+1)) INTO Str_AttribNo FROM CATREGIONMAP ci
+		WHERE ci.CATNAME = v_CategoryName AND ci.AttrName = v_AttribName2;
+		IF TO_NUMBER(Str_AttribNo) > 0 THEN
+			SELECT VALSTR INTO Str_Value2 FROM LLATTRDATA WHERE ID = v_ID AND ATTRID = TO_NUMBER(Str_AttribNo)
+			AND VERNUM = (SELECT MAX(VERNUM) FROM LLATTRDATA WHERE ID = v_ID );
+			COMMIT;
+		END IF;
+		Str_AttribNo := '0';
+		SELECT substr(ci.REGIONNAME, (INSTRC(ci.REGIONNAME,'_',1,2)+1)) INTO Str_AttribNo FROM CATREGIONMAP ci
+		WHERE ci.CATNAME = v_CategoryName AND ci.AttrName = v_AttribName3;
+		IF TO_NUMBER(Str_AttribNo) > 0 THEN
+			SELECT VALSTR INTO Str_Value3 FROM LLATTRDATA WHERE ID = v_ID AND ATTRID = TO_NUMBER(Str_AttribNo)
+			AND VERNUM = (SELECT MAX(VERNUM) FROM LLATTRDATA WHERE ID = v_ID );
+			COMMIT;
+		END IF;
+		Str_AttribNo := '0';
+		SELECT substr(ci.REGIONNAME, (INSTRC(ci.REGIONNAME,'_',1,2)+1)) INTO Str_AttribNo FROM CATREGIONMAP ci
+		WHERE ci.CATNAME = v_CategoryName AND ci.AttrName = v_AttribName4;
+		IF TO_NUMBER(Str_AttribNo) > 0 THEN
+			SELECT VALSTR INTO Str_Value4 FROM LLATTRDATA WHERE ID = v_ID AND ATTRID = TO_NUMBER(Str_AttribNo)
+			AND VERNUM = (SELECT MAX(VERNUM) FROM LLATTRDATA WHERE ID = v_ID );
+			COMMIT;
+		END IF;
+	END IF;
+	OPEN cv_1 FOR
+	SELECT Str_Value1 AS "VALUE1", Str_Value2 AS "VALUE2", Str_Value3 AS "VALUE3", Str_Value4 AS "VALUE4"
+	FROM DUAL;
+END;
+
 
 create or replace PROCEDURE Temp_AMSA_CS_GENERIC_U(v_DOCID           IN NVARCHAR2
                                                     ,v_CategoryName IN NVARCHAR2
@@ -69,3 +114,24 @@ BEGIN
     END IF;
     dbms_output.put_line('----DONE----');
 END;
+
+
+Lebohang 
+
+    SELECT count(*)
+    FROM V_TC_SCAN2@tcp TC INNER JOIN dtree VDB1 ON TC.DOCID = VDB1.NAME
+    INNER JOIN LLATTRDATA LL ON VDB1.DATAID = LL.ID
+    WHERE LL.ATTRID = 2
+    AND LL.VERNUM = (SELECT MAX(L1.VERNUM) FROM LLATTRDATA L1 WHERE L1.ID = LL.ID )
+    AND VDB1.parentid IN (SELECT DATAID FROM dtree WHERE parentid = 2352092)
+    AND LL.VALSTR IS NULL;
+    
+
+-- 305672
+-- 306591 TEST CERTIFICATES MISSING
+2016-06-30  08:15   -   282106
+2016-06-30  09:30   -   280660   
+2016-07-01  12:42   -   270905     
+2016-07-01  17:40   -   267071     
+
+

@@ -1,0 +1,21 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AMSATenderOffice.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="CategoryName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">RFQ</Value>
+    </Setting>
+    <Setting Name="AttribName1" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Status</Value>
+    </Setting>
+    <Setting Name="AttribName2" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Return Date</Value>
+    </Setting>
+    <Setting Name="AttribName3" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Return Time</Value>
+    </Setting>
+    <Setting Name="AttribName4" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">RFQ Amount</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

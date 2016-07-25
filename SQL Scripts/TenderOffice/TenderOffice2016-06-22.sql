@@ -16,7 +16,8 @@ CREATE TABLE AMSA_RFQ
     scanpc        	varchar2(200) 	NULL, 	--**To be populated by Scan client (Optional)
     scandate      	date          	NULL, 	--**To be populated by Scan client (Optional)
     ReturnedDate  	date          	NULL, 	--**Must be populated by Scan client 
-    Source  		varchar2(20)    NULL 	--**To be populated by Scan client (Optional)
+    Source  		varchar2(20)    NULL, 	--**To be populated by Scan client (Optional)
+	UPDATEDINSAP	number(1)		DEFAULT 0 NOT NULL 	--Indicator used to see which records have already been uploaded to SAP
 );
 
 CREATE SEQUENCE  "OTCS"."AMSA_RFQ_SEC"  MINVALUE 1 MAXVALUE 99999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER  NOCYCLE ;
@@ -33,7 +34,8 @@ create or replace PROCEDURE AMSA_RFQ_U
                    ,v_BUYERNO           IN NVARCHAR2
                    ,v_BUYERNAME         IN NVARCHAR2
                    ,v_LOCATIONNO        IN NVARCHAR2
-                   ,v_LOCATION          IN NVARCHAR2)
+                   ,v_LOCATION          IN NVARCHAR2
+				   ,v_UPDATEDINSAP		IN NVARCHAR2)
 AS
 TmpNewId Number;
 BEGIN
@@ -43,9 +45,9 @@ BEGIN
 			INTO TmpNewId
 			FROM Dual;
 			INSERT INTO AMSA_RFQ (ID, RFQNO, RFQ_GROUPNO, OURREF, DESCRIPTION, CLOSINGDATE, VENDORNO, VENDORNAME, BUYERNO, BUYERNAME, 
-					LOCATIONNO, LOCATION)
+					LOCATIONNO, LOCATION, UPDATEDINSAP)
 			SELECT TmpNewId, v_RFQNO, v_RFQ_GROUPNO, v_OURREF, v_DESCRIPTION, TO_DATE(v_CLOSINGDATE, 'yyyymmdd'), v_VENDORNO, v_VENDORNAME, v_BUYERNO, v_BUYERNAME, 
-				v_LOCATIONNO, v_LOCATION FROM DUAL WHERE NOT EXISTS (SELECT * FROM AMSA_RFQ WHERE RFQNO = v_RFQNO);
+				v_LOCATIONNO, v_LOCATION, v_UPDATEDINSAP FROM DUAL WHERE NOT EXISTS (SELECT * FROM AMSA_RFQ WHERE RFQNO = v_RFQNO);
 		END;
 	ELSE
 		UPDATE AMSA_RFQ
@@ -59,7 +61,8 @@ BEGIN
 				BUYERNO = v_BUYERNO, 
 				BUYERNAME = v_BUYERNAME, 
 				LOCATIONNO = v_LOCATIONNO, 
-				"LOCATION" = v_LOCATION
+				"LOCATION" = v_LOCATION,
+				UPDATEDINSAP = v_UPDATEDINSAP
 		WHERE ID = v_ID; 
 	END IF;
    COMMIT;
@@ -71,8 +74,8 @@ AS
 BEGIN
 	OPEN cv_1 FOR
 	SELECT ID, RFQNO, RFQ_GROUPNO, OURREF, DESCRIPTION, 
-    CLOSINGDATE, VENDORNO, VENDORNAME, BUYERNO, BUYERNAME, 
-		LOCATIONNO, "LOCATION"
+		CLOSINGDATE, VENDORNO, VENDORNAME, BUYERNO, BUYERNAME, 
+		LOCATIONNO, "LOCATION", UPDATEDINSAP
 	FROM AMSA_RFQ
 	WHERE RFQNO = (SELECT MAX(RFQNO) FROM AMSA_RFQ);
 END;
