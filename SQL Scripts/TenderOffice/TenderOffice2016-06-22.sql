@@ -11,8 +11,8 @@ CREATE TABLE AMSA_RFQ
     VENDORNAME      varchar2(35) 	NULL,	--NAME1 Name 1
 	BUYERNO 		varchar2(3) 	NULL,	--EKGRP  Purchasing Group
     BUYERNAME      	varchar2(18)    NULL,  	--EKNAM Description of purchasing group
-	LOCATIONNO		varchar2(4)     NULL,  	--EKORG  Purchasing Organization
-    LOCATION     	varchar2(20)  	NULL,	--EKOTX   Description of Purchasing Organization
+	LOCATIONNO		varchar2(4)     NULL,  	--BUKRS  Purchasing Organization
+    LOCATION     	varchar2(20)  	NULL,	--BUTXT   Description of Purchasing Organization
     scanpc        	varchar2(200) 	NULL, 	--**To be populated by Scan client (Optional)
     scandate      	date          	NULL, 	--**To be populated by Scan client (Optional)
     ReturnedDate  	date          	NULL, 	--**Must be populated by Scan client 

@@ -25,7 +25,7 @@ namespace AMSATenderOffice.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("RFQ")]
+        [global::System.Configuration.DefaultSettingValueAttribute("RFQ Responses")]
         public string CategoryName {
             get {
                 return ((string)(this["CategoryName"]));
@@ -34,7 +34,7 @@ namespace AMSATenderOffice.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Status")]
+        [global::System.Configuration.DefaultSettingValueAttribute("RFQ Amount")]
         public string AttribName1 {
             get {
                 return ((string)(this["AttribName1"]));
@@ -43,7 +43,7 @@ namespace AMSATenderOffice.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Return Date")]
+        [global::System.Configuration.DefaultSettingValueAttribute("SAP Update")]
         public string AttribName2 {
             get {
                 return ((string)(this["AttribName2"]));
@@ -61,7 +61,7 @@ namespace AMSATenderOffice.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("RFQ Amount")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Status")]
         public string AttribName4 {
             get {
                 return ((string)(this["AttribName4"]));

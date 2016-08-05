@@ -26,10 +26,29 @@ namespace AMSATenderOffice
                 RFQ myRFQ = new RFQ();
                 myRFQ.GetLastRFQ();
                 classSAP.GetRFQList(myRFQ.ToString());
-                RFQList MyRFQList = new RFQList();
+                RFQList MyRFQList = new RFQList(); // Get a list where myRFQ.UpdatedInSap = 0; 
                 foreach(RFQ myRfq in MyRFQList)
                 {
                     myRFQ.GetReturnInfo(Properties.Settings.Default.CategoryName, Properties.Settings.Default.AttribName1, Properties.Settings.Default.AttribName2, Properties.Settings.Default.AttribName3, Properties.Settings.Default.AttribName4);
+                    if(!String.IsNullOrEmpty(myRFQ.RfqAmount))
+                    {
+                        myRFQ.Status = "PreSAP";
+                        myRFQ.Save();
+                        if (classSAP.AMSAUpdateRFQ(myRFQ.RfqNo, myRFQ.RfqAmount))
+                        {
+                            myRFQ.Status = "IN SAP";
+                            myRFQ.Save();
+                            if (myRFQ.UpdateRFQInContentServer(Properties.Settings.Default.CategoryName, Properties.Settings.Default.AttribName1, myRFQ.RfqAmount))
+                            {
+                                if (myRFQ.UpdateRFQInContentServer(Properties.Settings.Default.CategoryName, Properties.Settings.Default.AttribName2, "5"))
+                                {
+                                    myRFQ.UpdatedInSap = 1; 
+                                    myRFQ.Status = "IN CS";
+                                    myRFQ.Save();
+                                }
+                            }
+                        }
+                    }
                 }
                 //sort list with returned info
                 var queryReturnedRFQs = from rfq in MyRFQList

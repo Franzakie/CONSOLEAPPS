@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "COTBCMTOCRM", "COTBCMTOCRM\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "COTEFM", "COTEFM\COTEFM.csproj", "{1F863B30-4AAB-4A6B-B500-67ACF1D157BD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AmsaEmployeeDetails", "AmsaEmployeeDetails\AmsaEmployeeDetails.csproj", "{17F79A4A-DC9C-4F26-853B-A704BF213CC0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,14 @@ Global
 		{1F863B30-4AAB-4A6B-B500-67ACF1D157BD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1F863B30-4AAB-4A6B-B500-67ACF1D157BD}.Release|x64.ActiveCfg = Release|Any CPU
 		{1F863B30-4AAB-4A6B-B500-67ACF1D157BD}.Release|x86.ActiveCfg = Release|Any CPU
+		{17F79A4A-DC9C-4F26-853B-A704BF213CC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17F79A4A-DC9C-4F26-853B-A704BF213CC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17F79A4A-DC9C-4F26-853B-A704BF213CC0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{17F79A4A-DC9C-4F26-853B-A704BF213CC0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{17F79A4A-DC9C-4F26-853B-A704BF213CC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17F79A4A-DC9C-4F26-853B-A704BF213CC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17F79A4A-DC9C-4F26-853B-A704BF213CC0}.Release|x64.ActiveCfg = Release|Any CPU
+		{17F79A4A-DC9C-4F26-853B-A704BF213CC0}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

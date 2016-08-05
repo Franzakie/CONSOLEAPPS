@@ -3,19 +3,19 @@
   <Profiles />
   <Settings>
     <Setting Name="CategoryName" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">RFQ</Value>
+      <Value Profile="(Default)">RFQ Responses</Value>
     </Setting>
     <Setting Name="AttribName1" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Status</Value>
+      <Value Profile="(Default)">RFQ Amount</Value>
     </Setting>
     <Setting Name="AttribName2" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Return Date</Value>
+      <Value Profile="(Default)">SAP Update</Value>
     </Setting>
     <Setting Name="AttribName3" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Return Time</Value>
     </Setting>
     <Setting Name="AttribName4" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">RFQ Amount</Value>
+      <Value Profile="(Default)">Status</Value>
     </Setting>
   </Settings>
 </SettingsFile>
