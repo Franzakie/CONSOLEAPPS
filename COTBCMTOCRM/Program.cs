@@ -1,4 +1,10 @@
 ﻿// The COTBCMTOCRM Console application
+/*
+ * Created by : EOH
+ * Author: Franz Seidel
+ * Description
+ * This application exclusively finds Interaction Record numbers from CRM SAP for given Call Ids received in a special custom table called COT_RM_BCM.
+*/
 using System;
 using System.Collections.Generic;
 using System.Linq;
