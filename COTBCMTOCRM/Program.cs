@@ -1,4 +1,5 @@
-﻿using System;
+﻿// The COTBCMTOCRM Console application
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,20 +17,22 @@ namespace COTBCMTOCRM
     {
         static void Main(string[] args)
         {
-//            MailConstructor.CreateGMail("This is some obscure message in the body");
-
+            //Write a log file to the same directory in which the code is excecuted from
             classStatic.CreateLog("Application Started on :" + DateTime.Now.ToString());
             try
             {
+                //Get a list of all CallId's for which an interaction number needs to be retrieved.
                 CallList myCalls = new CallList();
                 foreach (Call myCall in myCalls)
                 {
+                    // For each of the call Id's in the list do a query to  SAP to get the Interaction Number.
                     myCall.BCMStatus = "IARECFOUND";
                     classSAP.GetCotIARecord(myCall);
                 }
             }
             catch (Exception err)
             {
+                //Write any Exceptions that may occur to the Log file
                 String errorMessage = "An unexpected error occurred: " + err.Message;
                 Console.WriteLine(errorMessage);
                 classStatic.AppendLog(errorMessage);

@@ -23,37 +23,36 @@ namespace AMSATenderOffice
             classStatic.CreateLog("Application Started on :" + DateTime.Now.ToString());
             try
             {
-                RFQ myRFQ = new RFQ();
-                myRFQ.GetLastRFQ();
-                classSAP.GetRFQList(myRFQ.ToString());
+                RFQ mylastRFQ = new RFQ();
+                mylastRFQ.GetLastRFQ();
+                classSAP.GetRFQList(mylastRFQ.ToString());
                 RFQList MyRFQList = new RFQList(); // Get a list where myRFQ.UpdatedInSap = 0; 
                 foreach(RFQ myRfq in MyRFQList)
                 {
-                    myRFQ.GetReturnInfo(Properties.Settings.Default.CategoryName, Properties.Settings.Default.AttribName1, Properties.Settings.Default.AttribName2, Properties.Settings.Default.AttribName3, Properties.Settings.Default.AttribName4);
-                    if(!String.IsNullOrEmpty(myRFQ.RfqAmount))
+                    myRfq.GetReturnInfo(Properties.Settings.Default.CategoryName, Properties.Settings.Default.AttribName1, Properties.Settings.Default.AttribName2, Properties.Settings.Default.AttribName3, Properties.Settings.Default.AttribName4);
+                    if (!String.IsNullOrEmpty(myRfq.RfqAmount))
                     {
-                        myRFQ.Status = "PreSAP";
-                        myRFQ.Save();
-                        if (classSAP.AMSAUpdateRFQ(myRFQ.RfqNo, myRFQ.RfqAmount))
+                        myRfq.Status = "PreSAP";
+                        myRfq.Save();
+                        if (classSAP.AMSAUpdateRFQ(myRfq.RfqNo, myRfq.RfqAmount))
                         {
-                            myRFQ.Status = "IN SAP";
-                            myRFQ.Save();
-                            if (myRFQ.UpdateRFQInContentServer(Properties.Settings.Default.CategoryName, Properties.Settings.Default.AttribName1, myRFQ.RfqAmount))
+                            myRfq.Status = "IN SAP";
+                            myRfq.Save();
+                            //if (myRfq.UpdateRFQInContentServer(Properties.Settings.Default.CategoryName, Properties.Settings.Default.AttribName1, myRfq.RfqAmount))
+                            //{
+                            if (myRfq.UpdateRFQInContentServer(Properties.Settings.Default.CategoryName, Properties.Settings.Default.AttribName2, 5))
                             {
-                                if (myRFQ.UpdateRFQInContentServer(Properties.Settings.Default.CategoryName, Properties.Settings.Default.AttribName2, "5"))
-                                {
-                                    myRFQ.UpdatedInSap = 1; 
-                                    myRFQ.Status = "IN CS";
-                                    myRFQ.Save();
-                                }
+                                myRfq.UpdatedInSap = 5;  // Indicator that indicates that the record has successfully been updated in SAP
+                                myRfq.Status = "IN CS";
+                                myRfq.Save();
                             }
+                            //}
                         }
                     }
                 }
-                //sort list with returned info
-                var queryReturnedRFQs = from rfq in MyRFQList
-                                        where rfq.Status != ""
-                                        select rfq;
+                //var queryReturnedRFQs = from rfq in MyRFQList
+                //                        where rfq.Status != ""
+                //                        select rfq;
                 //classSAP.RFQUpdate((RFQList)queryReturnedRFQs);
             }
             catch (Exception err)

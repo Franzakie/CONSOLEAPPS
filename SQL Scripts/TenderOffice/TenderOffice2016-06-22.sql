@@ -1,3 +1,5 @@
+
+
 drop table AMSA_RFQ;
 CREATE TABLE AMSA_RFQ
 (   
