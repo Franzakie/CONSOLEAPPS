@@ -25,7 +25,18 @@ namespace AMSATenderOffice
             {
                 RFQ mylastRFQ = new RFQ();
                 mylastRFQ.GetLastRFQ();
-                classSAP.GetRFQList(mylastRFQ.ToString());
+                if (String.IsNullOrEmpty(mylastRFQ.RfqNo))
+                {
+                    classSAP.GetRFQList(String.Empty);
+                }
+                else
+                {
+                    classSAP.GetRFQList(mylastRFQ.ToString()); 
+                    mylastRFQ.GetLast600RangeRFQ();
+                    classSAP.GetRFQList(mylastRFQ.ToString());
+                    mylastRFQ.GetLast601RangeRFQ();
+                    classSAP.GetRFQList(mylastRFQ.ToString());
+                }
                 RFQList MyRFQList = new RFQList(); // Get a list where myRFQ.UpdatedInSap = 0; 
                 foreach(RFQ myRfq in MyRFQList)
                 {
