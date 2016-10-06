@@ -37,10 +37,9 @@ namespace AMSATenderOffice
                     mylastRFQ.GetLast601RangeRFQ();
                     classSAP.GetRFQList(mylastRFQ.ToString());
                 }
-                RFQList MyRFQList = new RFQList(); // Get a list where myRFQ.UpdatedInSap = 0; 
+                RFQList MyRFQList = new RFQList(); // Get a list where myRFQ.UpdatedInSap in (1,2); 
                 foreach(RFQ myRfq in MyRFQList)
                 {
-                    myRfq.GetReturnInfo(Properties.Settings.Default.CategoryName, Properties.Settings.Default.AttribName1, Properties.Settings.Default.AttribName2, Properties.Settings.Default.AttribName3, Properties.Settings.Default.AttribName4);
                     if (!String.IsNullOrEmpty(myRfq.RfqAmount))
                     {
                         myRfq.Status = "PreSAP";
@@ -48,23 +47,20 @@ namespace AMSATenderOffice
                         if (classSAP.AMSAUpdateRFQ(myRfq.RfqNo, myRfq.RfqAmount))
                         {
                             myRfq.Status = "IN SAP";
+                            myRfq.UpdatedInSap = 5;  
                             myRfq.Save();
-                            //if (myRfq.UpdateRFQInContentServer(Properties.Settings.Default.CategoryName, Properties.Settings.Default.AttribName1, myRfq.RfqAmount))
-                            //{
-                            if (myRfq.UpdateRFQInContentServer(Properties.Settings.Default.CategoryName, Properties.Settings.Default.AttribName2, 5))
-                            {
-                                myRfq.UpdatedInSap = 5;  // Indicator that indicates that the record has successfully been updated in SAP
-                                myRfq.Status = "IN CS";
-                                myRfq.Save();
-                            }
+                            classStatic.AppendLog(myRfq.RfqNo + "\t Uploaded successfully for closing date \t" + myRfq.ClosingDate.ToString());
                             //}
+                        }
+                        else
+                        {
+                            myRfq.UpdatedInSap = 8;  // Indicator that indicates that the record has failed to update in SAP
+                            myRfq.Status = "SAP UPDATE FAILED";
+                            myRfq.Save();
+                            classStatic.AppendLog(myRfq.RfqNo + "\t has failed for closing date \t" + myRfq.ClosingDate.ToString());
                         }
                     }
                 }
-                //var queryReturnedRFQs = from rfq in MyRFQList
-                //                        where rfq.Status != ""
-                //                        select rfq;
-                //classSAP.RFQUpdate((RFQList)queryReturnedRFQs);
             }
             catch (Exception err)
             {
