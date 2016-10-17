@@ -37,13 +37,13 @@ namespace AMSATenderOffice
                     mylastRFQ.GetLast601RangeRFQ();
                     classSAP.GetRFQList(mylastRFQ.ToString());
                 }
+                //Update statuses for price updating
+                mylastRFQ.UpdateRFQStatusForPriceConsideration();
                 RFQList MyRFQList = new RFQList(); // Get a list where myRFQ.UpdatedInSap in (1,2); 
                 foreach(RFQ myRfq in MyRFQList)
                 {
                     if (!String.IsNullOrEmpty(myRfq.RfqAmount))
                     {
-                        myRfq.Status = "PreSAP";
-                        myRfq.Save();
                         if (classSAP.AMSAUpdateRFQ(myRfq.RfqNo, myRfq.RfqAmount))
                         {
                             myRfq.Status = "IN SAP";
@@ -61,6 +61,9 @@ namespace AMSATenderOffice
                         }
                     }
                 }
+                //Link documents to SAP.
+                mylastRFQ.LinkDocToArchivelink();
+
             }
             catch (Exception err)
             {

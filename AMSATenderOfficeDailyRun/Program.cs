@@ -20,14 +20,15 @@ namespace AMSATenderOfficeDailyRun
             classStatic.CreateLog("Application Started on :" + DateTime.Now.ToString());
             try
             {
-                RFQ mylastRFQ = new RFQ();
-                mylastRFQ.GetLastRFQ();
-                if (String.IsNullOrEmpty(mylastRFQ.RfqNo))
+                string reLoad = Properties.Settings.Default.ReloadAll;
+                if (reLoad.ToUpper().Equals("YES"))
                 {
                     classSAP.GetMissingRFQList(String.Empty);
                 }
                 else
                 {
+                    RFQ mylastRFQ = new RFQ();
+                    mylastRFQ.GetLastRFQ();
                     long NewNumber = long.Parse(mylastRFQ.ToString());
                     NewNumber = NewNumber - 3000;
                     classSAP.GetMissingRFQList(NewNumber.ToString());
@@ -37,7 +38,7 @@ namespace AMSATenderOfficeDailyRun
                     classSAP.GetMissingRFQList(NewNumber.ToString());
                     mylastRFQ.GetLast601RangeRFQ();
                     NewNumber = long.Parse(mylastRFQ.ToString());
-                    NewNumber = NewNumber - 3500;
+                    NewNumber = NewNumber - 3000;
                     classSAP.GetMissingRFQList(NewNumber.ToString());
                 }
             }

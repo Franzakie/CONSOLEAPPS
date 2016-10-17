@@ -36,5 +36,75 @@ SELECT DATAID FROM DTREECORE WHERE NAME = '1001638185-6019855524-WIDE RANGE ENGI
         SELECT Str_Value_Start || v_Value || Str_Value_End INTO Str_New_Value FROM DUAL;
 
 
-=6,'Values'={D/2016/9/16:0:0:0}>,7=A<1,?,'ID'=7,'Values'={'14:00'}>,8=A<1,?,'ID'=8,'Values'={'0001159005'}>,9=A<1,?,'ID'=9,'Values'={'WIDE RANGE ENGINEERING CC'}>,10=A<1,?,'ID'=10,'
+create or replace PROCEDURE P_NEWSAPLINK_RFQ_PREP AS 
+BEGIN
+  
+  INSERT INTO AMSA_SAPLINK (DATAID,
+OBJECT_ID,
+CLASSNAME,
+FIELD_NAME,
+REC_ID,
+VER_ID,
+VER_DATE,
+DOCNAME,
+DOCID,
+ARCHID, 
+DESCRIPTION,
+MIMETYPE,
+STATUS_F,
+ACTION,
+INFO_TYPE,
+SUB_INFO_TYPE,
+SAP_OBJTYPE,
+SAP_DOCTYPE
+) 
+( SELECT  distinct(ll.ID) AS DATAID
+    ,ll.ValStr AS OBJECT_ID
+    ,c.CLASSNAME AS CLASSNAME
+    ,ci.ATTRNAME AS FIELD_NAME
+ ,dv.DocID|| '_'||dv.Version AS REC_ID
+ ,dv.Version AS VER_ID
+ ,dv.VerCDate AS VER_DATE
+ ,dv.Filename AS DOCNAME
+ ,DBMS_LOB.SUBSTR(p.providerdata, ((INSTR(p.providerdata,',',(INSTR(p.providerdata,'@')))-2)-(INSTR(p.providerdata,'@'))), (INSTR(p.providerdata,'@')+1)) AS DOCID 
+ ,DBMS_LOB.SUBSTR(p.providerdata,2,(instr(p.providerdata,'//',1,1))+2) AS ARCHID
+ ,NULL
+ ,'PDF'
+ ,'N'
+ ,'N'
+ ,C.INFO_TYPE AS INFO_TYPE
+ ,C.SUB_INFO_TYPE as SUB_INFO_TYPE
+ ,C.SAP_OBJTYPE as SAP_OBJTYPE
+ ,C.SAP_DOCTYPE as SAP_DOCTYPE
+  FROM DVersData dv
+  ,PROVIDERDATA p
+  ,LLATTRDATA ll
+  ,CATREGIONMAP ci
+  ,AMSA_SAPLINK_CAT c
+  ,AMSA_RFQ rfq
+  where dv.ProviderId = p.providerID 
+  and rfq.RFQNO = ll.ValStr
+  --and (rfq.CLOSINGDATE >= (sysdate - 3) 
+  and rfq.CLOSINGDATE <= sysdate
+  and ci.CATNAME = C.CATNAME
+  and p.providerType = 'L1'
+  and dv.VERTYPE is null
+  and dv.DocID = ll.ID
+  and  ll.DefID = ci.CatID
+    and ll.AttrID = substr(ci.REGIONNAME, (INSTRC(ci.REGIONNAME,'_',1,2)+1))
+    and LENGTH(ll.ValStr) > 2
+    and ci.CATNAME in ('RFQ Responses')
+      and ci.AttrName in ('RFQ Number')     
+       and dv.DocID|| '_'||dv.Version NOT IN (select REC_ID FROM AMSA_SAPLINK WHERE CLASSNAME = 'RFQS'));
+
+COMMIT;
+
+
+UPDATE AMSA_SAPLINK
+SET DESCRIPTION = (SELECT NAME from DTREECORE
+where DTREECORE.dataid = AMSA_SAPLINK.dataid);
+
+COMMIT;
+  
+END P_NEWSAPLINK_RFQ_PREP;
 
