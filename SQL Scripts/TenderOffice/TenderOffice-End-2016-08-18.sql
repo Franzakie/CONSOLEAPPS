@@ -84,8 +84,7 @@ SAP_DOCTYPE
   ,AMSA_RFQ rfq
   where dv.ProviderId = p.providerID 
   and rfq.RFQNO = ll.ValStr
-  --and (rfq.CLOSINGDATE >= (sysdate - 3) 
-  and rfq.CLOSINGDATE <= sysdate
+  AND rfq.UPDATEDINSAP = 5
   and ci.CATNAME = C.CATNAME
   and p.providerType = 'L1'
   and dv.VERTYPE is null

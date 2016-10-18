@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BusinessClass;
+using BusinessClass.AMSA;
 using BusinessClass.List;
 using BusinessClass.SAP;
 using BusinessClass.Static;
@@ -63,6 +64,9 @@ namespace AMSATenderOffice
                 }
                 //Link documents to SAP.
                 mylastRFQ.LinkDocToArchivelink();
+                //Get list of links
+                
+                //update status of already linked documents.
 
             }
             catch (Exception err)
