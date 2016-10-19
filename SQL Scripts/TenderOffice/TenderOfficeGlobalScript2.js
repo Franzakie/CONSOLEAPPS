@@ -1,22 +1,3 @@
-import System
-import System.Collections
-import System.Data
-import System.Globalization
-import System.Windows.Forms
-import System.Data.OracleClient  // this will need System.Data..OracleClient.dll reference from %WINDIR%\Microsoft.NET\Framework64\<version>
-
-//	INSTALLATION NOTE: Copy System.Data.OracleClient to C:\Program Files (x86)\OpenText\Scan\bin AND ADD TO REFERENCES TAB
-
-/*
-=====================================================================================================================================================
-    Project Name:  Tender Office RFQ Scanning
-    Created by:    Franz Siedel
-    Created Date:  28 June 2016
-    Modified by:   Marcel Smit
-    Modified Date: 19 August 2016
-=====================================================================================================================================================
-*/
-
 function fetchRfQ(rfqNo, src)
 {
     /*
@@ -58,24 +39,20 @@ function fetchRfQ(rfqNo, src)
      Clear Field Values and set defaults
     =====================================
     */
-
-    //if(strFirstRun == "Yes")
-    //{
-        Fields["7355322.15:Collective Number"].Value = "";
-        Fields["7355322.15:Location No"].Value = "";
-        Fields["7355322.15:Location"].Value = "";
-        Fields["7355322.15:Closing Date"].Value = "";
-        Fields["7355322.15:Closing Time"].Value = "";
-        Fields["7355322.15:Vendor Number"].Value = "";
-        Fields["7355322.15:Vendor Name"].Value = "";
-        Fields["7355322.15:Source Detail"].Value = "";
-        Fields["7355322.15:Buyer No"].Value = "";
-        Fields["7355322.15:Buyer Name"].Value = "";
-        Fields["7355322.15:Send to Buyer"].Value = "No";
-        Fields["7355322.15:Scan Date"].Value = scandate;
-        Fields["7355322.15:Scan Pc"].Value = scanpc;
-        Fields["7355322.15:SAP Update"].Value = "0";
-    //}
+	Fields["7355322.15:Collective Number"].Value = "";
+	Fields["7355322.15:Location No"].Value = "";
+	Fields["7355322.15:Location"].Value = "";
+	Fields["7355322.15:Closing Date"].Value = "";
+	Fields["7355322.15:Closing Time"].Value = "";
+	Fields["7355322.15:Vendor Number"].Value = "";
+	Fields["7355322.15:Vendor Name"].Value = "";
+	Fields["7355322.15:Source Detail"].Value = "";
+	Fields["7355322.15:Buyer No"].Value = "";
+	Fields["7355322.15:Buyer Name"].Value = "";
+	Fields["7355322.15:Send to Buyer"].Value = "No";
+	Fields["7355322.15:Scan Date"].Value = scandate;
+	Fields["7355322.15:Scan Pc"].Value = scanpc;
+	Fields["7355322.15:SAP Update"].Value = "0";
 
     /*
     ====================================
@@ -184,6 +161,7 @@ function fetchRfQ(rfqNo, src)
 
         cmd.CommandText = "select ID, RFQ_GROUPNO, LOCATIONNO, LOCATION, CLOSINGDATE, OURREF, VENDORNO, VENDORNAME, BUYERNO, BUYERNAME, UPDATEDINSAP, MATERIALNO, RETFAXNO, BUYEREMAIL, PRICE, SCANPC from AMSA_RFQ WHERE RFQNO = " + "'" + rfqNo + "'";
 
+        cmdUpd.CommandText = "Update AMSA_RFQ set UPDATEDINSAP = 3, SCANPC = '" + scanpc + "', SCANDATE = sysdate WHERE RFQNO = " + "'" + rfqNo + "'";
         cmdUpd2.CommandText = "Update AMSA_RFQ_FILES set RFQNO = '" + rfqNo + "' Where FILENAME = '" + strFileName + "'";
 
         /* 
@@ -323,11 +301,13 @@ function fetchRfQ(rfqNo, src)
                     {
                         Fields["7355322.15:Status"].Value = "On-time";
                         Fields["7355322.15:SAP Update"].Value = "3";
+                        cmdUpd.CommandText = "Update AMSA_RFQ set UPDATEDINSAP = 3, SCANPC = '" + scanpc + "', SCANDATE = sysdate, PRICE = '" + strRFQPrice + "' WHERE RFQNO = " + "'" + rfqNo + "'";
                     }
                     else
                     {
                         Fields["7355322.15:Status"].Value = "Late";
                         Fields["7355322.15:SAP Update"].Value = "4";
+                        cmdUpd.CommandText = "Update AMSA_RFQ set UPDATEDINSAP = 4, SCANPC = '" + scanpc + "', SCANDATE = sysdate, PRICE = '" + strRFQPrice + "' WHERE RFQNO = " + "'" + rfqNo + "'";
                     }
                 }
 
@@ -335,18 +315,21 @@ function fetchRfQ(rfqNo, src)
                 {
                     Fields["7355322.15:Status"].Value = "On-time";
                     Fields["7355322.15:SAP Update"].Value = "4";
+                    cmdUpd.CommandText = "Update AMSA_RFQ set UPDATEDINSAP = 4, SCANPC = '" + scanpc + "', SCANDATE = sysdate, PRICE = '" + strRFQPrice + "' WHERE RFQNO = " + "'" + rfqNo + "'";
                 }
 	
                 if(RFQType == "Recon")
                 {
                     Fields["7355322.15:Status"].Value = "On-time";
                     Fields["7355322.15:SAP Update"].Value = "4";
+                    cmdUpd.CommandText = "Update AMSA_RFQ set UPDATEDINSAP = 4, SCANPC = '" + scanpc + "', SCANDATE = sysdate, PRICE = '" + strRFQPrice + "' WHERE RFQNO = " + "'" + rfqNo + "'";
                 }
 
                 if(RFQType != "Standard" && RFQType != "Recon" && RFQType != "Breakdown")
                 {
                     Fields["7355322.15:Status"].Value = "On-time";
                     Fields["7355322.15:SAP Update"].Value = "4";
+                    cmdUpd.CommandText = "Update AMSA_RFQ set UPDATEDINSAP = 4, SCANPC = '" + scanpc + "', SCANDATE = sysdate, PRICE = '" + strRFQPrice + "' WHERE RFQNO = " + "'" + rfqNo + "'";
                 }
             }
 
@@ -370,6 +353,8 @@ function fetchRfQ(rfqNo, src)
                     Fields["7355322.15:Send to Buyer"].Value = "No";
                     strInformation = strInformation + "SendToBuyer=No | ";
                 }
+
+                cmdUpd.ExecuteNonQuery();
 
                 if(src == "Fax")
                 {
