@@ -291,7 +291,10 @@ function fetchRfQ(rfqNo, src)
 
                 strRFQPrice = Fields["7355322.15:RFQ Amount"].Value;
 
-                if(strRFQPrice == ""){strCanUpdate = "No"; strInformation = strInformation = "CanUpdate=" + strCanUpdate;}else{strCanUpdate = "Yes"; strInformation = strInformation = "CanUpdate=" + strCanUpdate;}
+                if(strRFQPrice == "")
+                {strCanUpdate = "No"; strInformation = strInformation = "CanUpdate=" + strCanUpdate;}
+                else
+                {strCanUpdate = "Yes"; strInformation = strInformation = "CanUpdate=" + strCanUpdate;}
 
                 var strCloseDateTime = dr["CLOSINGDATE"].ToString(currentFormat.ShortDatePattern) + " " + dr["OURREF"];
 
@@ -354,6 +357,7 @@ function fetchRfQ(rfqNo, src)
                     strInformation = strInformation + "SendToBuyer=No | ";
                 }
 
+                cmdUpd.CommandText = "Update AMSA_RFQ set UPDATEDINSAP = " + Fields["7355322.15:SAP Update"].Value + ", SCANPC = '" + scanpc + "', SCANDATE = sysdate, PRICE = '" + Fields["7355322.15:RFQ Amount"].Value + "' WHERE RFQNO = " + "'" + rfqNo + "'";
                 cmdUpd.ExecuteNonQuery();
 
                 if(src == "Fax")

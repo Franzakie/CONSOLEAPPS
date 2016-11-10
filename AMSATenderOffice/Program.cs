@@ -10,7 +10,7 @@ using BusinessClass.SAP;
 using BusinessClass.Static;
 using System.Diagnostics;
 using System.Configuration;
-using BusinessClass.List;
+using BusinessClass.SAP.List;
 
 //Tender Office
 //Franz Seidel
@@ -22,9 +22,85 @@ namespace AMSATenderOffice
         static void Main(string[] args)
         {
             classStatic.CreateLog("Application Started on :" + DateTime.Now.ToString());
+            RFQ mylastRFQ = new RFQ();
             try
             {
-                RFQ mylastRFQ = new RFQ();
+                //Update statuses for price updating
+                Double dblTemp;
+                String resultString = "";
+                mylastRFQ.UpdateRFQStatusForPriceConsideration();
+                RFQList MyRFQList = new RFQList(); // Get a list where myRFQ.UpdatedInSap in (1,2); 
+                foreach(RFQ myRfq in MyRFQList)
+                {
+                    if (!String.IsNullOrEmpty(myRfq.RfqAmount))
+                    {
+                        if (Double.TryParse(myRfq.RfqAmount, out dblTemp))
+                        {
+                            resultString = classSAP.AMSAUpdateRFQ(myRfq.RfqNo, myRfq.RfqAmount);
+                            if (String.IsNullOrEmpty(resultString))
+                            {
+                                myRfq.Status = "IN SAP";
+                                myRfq.UpdatedInSap = 5;
+                                myRfq.Save();
+                                classStatic.AppendLog(myRfq.RfqNo + "\t Uploaded successfully for closing date \t" + myRfq.ClosingDate.ToString());
+                                //}
+                            }
+                            else
+                            {
+                                if (resultString.Equals("FAILED"))
+                                {
+                                    myRfq.UpdatedInSap = 8;  // Indicator that indicates that the record has failed to update in SAP
+                                    myRfq.Status = "SAP UPDATE FAILED";
+                                    myRfq.Save();
+                                    classStatic.AppendLog(myRfq.RfqNo + "\t has failed to update price in SAP for closing date \t" + myRfq.ClosingDate.ToString());
+                                }
+                                else
+                                {
+                                    classStatic.AppendLog(myRfq.RfqNo + "\t has thrown some unexpected exception. \t" + myRfq.ClosingDate.ToString());
+                                }
+                            }
+                        }
+                    }
+                }
+                classStatic.AppendLog("Finished updating prices in sap on :" + DateTime.Now.ToString());
+            }
+            catch (Exception err)
+            {
+                String errorMessage = "An unexpected error occurred when Updating prices in SAP: " + err.Message;
+                Console.WriteLine(errorMessage);
+                classStatic.AppendLog(errorMessage);
+            }
+            try
+            {
+                //Prepare documents to be linked to SAP.
+                mylastRFQ.LinkDocToArchivelink();
+                //Get list of documents to be linked to SAP
+                ArchiveLinkList myArcList = ArchiveLinkList.GetArchiveLinkList();
+                String returnCode = "";
+                foreach(ArchiveLink myArcObj in myArcList)
+                {
+                    returnCode = myArcObj.LinkDocumentToSAP();
+                    if(String.IsNullOrEmpty(returnCode))
+                    {
+                        mylastRFQ.LinkDocToArchivelinkUpdateStatus(myArcObj.RecId, myArcObj.ArchDocId);
+                        classStatic.AppendLog("A document for RFQ \t" + myArcObj.ObjId + "\t was successfully linked to SAP \t" );
+                    }
+                    else
+                    {
+                        classStatic.AppendLog("A document for RFQ \t" + myArcObj.ObjId + "\t has failed to link to SAP. Message received:\t" + returnCode);
+                        // Mark with a status to stop it from perpetually retrying an item in error.
+                    }
+                }
+                classStatic.AppendLog("Finished linking documents in sap on :" + DateTime.Now.ToString());
+            }
+            catch (Exception err)
+            {
+                String errorMessage = "An unexpected error occurred when linking documents to SAP through Archive Link: " + err.Message;
+                Console.WriteLine(errorMessage);
+                classStatic.AppendLog(errorMessage);
+            }
+            try
+            {
                 mylastRFQ.GetLastRFQ();
                 if (String.IsNullOrEmpty(mylastRFQ.RfqNo))
                 {
@@ -32,46 +108,21 @@ namespace AMSATenderOffice
                 }
                 else
                 {
-                    classSAP.GetRFQList(mylastRFQ.ToString()); 
+                    Int32 nrOfRetrievedRecords = 0;
+                    nrOfRetrievedRecords = classSAP.GetRFQList(mylastRFQ.ToString());
+                    classStatic.AppendLog("Number of RFQs retrieved from Sap greater than the current Max number :" + nrOfRetrievedRecords + ". Finished at " + DateTime.Now.ToString());
                     mylastRFQ.GetLast600RangeRFQ();
-                    classSAP.GetRFQList(mylastRFQ.ToString());
+                    nrOfRetrievedRecords = classSAP.GetRFQList(mylastRFQ.ToString());
+                    classStatic.AppendLog("Number of RFQs retrieved from Sap for 600 number range :" + nrOfRetrievedRecords + ". Finished at " + DateTime.Now.ToString());
                     mylastRFQ.GetLast601RangeRFQ();
-                    classSAP.GetRFQList(mylastRFQ.ToString());
+                    nrOfRetrievedRecords = classSAP.GetRFQList(mylastRFQ.ToString());
+                    classStatic.AppendLog("Number of RFQs retrieved from Sap for 601 number range :" + nrOfRetrievedRecords + ". Finished at " + DateTime.Now.ToString());
                 }
-                //Update statuses for price updating
-                mylastRFQ.UpdateRFQStatusForPriceConsideration();
-                RFQList MyRFQList = new RFQList(); // Get a list where myRFQ.UpdatedInSap in (1,2); 
-                foreach(RFQ myRfq in MyRFQList)
-                {
-                    if (!String.IsNullOrEmpty(myRfq.RfqAmount))
-                    {
-                        if (classSAP.AMSAUpdateRFQ(myRfq.RfqNo, myRfq.RfqAmount))
-                        {
-                            myRfq.Status = "IN SAP";
-                            myRfq.UpdatedInSap = 5;  
-                            myRfq.Save();
-                            classStatic.AppendLog(myRfq.RfqNo + "\t Uploaded successfully for closing date \t" + myRfq.ClosingDate.ToString());
-                            //}
-                        }
-                        else
-                        {
-                            myRfq.UpdatedInSap = 8;  // Indicator that indicates that the record has failed to update in SAP
-                            myRfq.Status = "SAP UPDATE FAILED";
-                            myRfq.Save();
-                            classStatic.AppendLog(myRfq.RfqNo + "\t has failed for closing date \t" + myRfq.ClosingDate.ToString());
-                        }
-                    }
-                }
-                //Link documents to SAP.
-                mylastRFQ.LinkDocToArchivelink();
-                //Get list of links
-                
-                //update status of already linked documents.
-
+                classStatic.AppendLog("Finished retrieving new RFQs from sap on :" + DateTime.Now.ToString());
             }
             catch (Exception err)
             {
-                String errorMessage = "An unexpected error occurred: " + err.Message;
+                String errorMessage = "An unexpected error occurred when searching for new RFQs: " + err.Message;
                 Console.WriteLine(errorMessage);
                 classStatic.AppendLog(errorMessage);
             }
