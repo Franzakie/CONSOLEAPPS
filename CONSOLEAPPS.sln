@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AmsaEmployeeDetails", "Amsa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AMSATenderOfficeDailyRun", "AMSATenderOfficeDailyRun\AMSATenderOfficeDailyRun.csproj", "{05DB455F-A050-487F-A960-1CE6F936E5E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AMSAVendorManagement", "AMSAVendorManagement\AMSAVendorManagement.csproj", "{586D7CCF-2911-4EED-9D8C-B86CE83F350F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +93,14 @@ Global
 		{05DB455F-A050-487F-A960-1CE6F936E5E4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{05DB455F-A050-487F-A960-1CE6F936E5E4}.Release|x64.ActiveCfg = Release|Any CPU
 		{05DB455F-A050-487F-A960-1CE6F936E5E4}.Release|x86.ActiveCfg = Release|Any CPU
+		{586D7CCF-2911-4EED-9D8C-B86CE83F350F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{586D7CCF-2911-4EED-9D8C-B86CE83F350F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{586D7CCF-2911-4EED-9D8C-B86CE83F350F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{586D7CCF-2911-4EED-9D8C-B86CE83F350F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{586D7CCF-2911-4EED-9D8C-B86CE83F350F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{586D7CCF-2911-4EED-9D8C-B86CE83F350F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{586D7CCF-2911-4EED-9D8C-B86CE83F350F}.Release|x64.ActiveCfg = Release|Any CPU
+		{586D7CCF-2911-4EED-9D8C-B86CE83F350F}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
