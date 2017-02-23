@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BusinessClass;
+using BusinessClass.AMSA;
 using BusinessClass.List;
 using BusinessClass.SAP;
 using BusinessClass.Static;

@@ -13,8 +13,13 @@ import System.Data.OracleClient;  // this will need System.Data..OracleClient.dl
     Created by:    Franz Siedel
     Created Date:  28 June 2016
     Modified by:   Franz Seidel
-    Modified Date: 1 December 2016
-	Version Number:Tender Office - V7.3.17.xml
+    Modified Date: 7 December 2016
+	Version Number:Tender Office - V7.3.19.xml
+
+   Change Log:
+   Version	Author	Comments
+   =======	======	========
+   7.3.18	SK/KG	Added 14 to "SAP Update" field in CS
 =====================================================================================================================================================
 */
 
@@ -34,11 +39,11 @@ function EvaluateChanges()
     try
     {
         myFormat = System.Threading.Thread.CurrentThread.CurrentCulture.DateTimeFormat; 
-        RFQType = Fields["7355322.16:Type of RFQ"].Value;
-        receivedDate = Fields["7355322.16:Received Date"].Value;     
-        ClosedeDate = Fields["7355322.16:Closing Date"].Value;       
-        receivedTime = Fields["7355322.16:Received Time"].Value;     
-        ClosedeTime = Fields["7355322.16:Closing Time"].Value;       
+        RFQType = Fields["7355322.17:Type of RFQ"].Value;
+        receivedDate = Fields["7355322.17:Received Date"].Value;     
+        ClosedeDate = Fields["7355322.17:Closing Date"].Value;       
+        receivedTime = Fields["7355322.17:Received Time"].Value;     
+        ClosedeTime = Fields["7355322.17:Closing Time"].Value;       
         receivedDate = receivedDate.ToString(myFormat.ShortDatePattern);
         //MessageBox.Show(receivedDate);
         ClosedeDate = ClosedeDate.ToString(myFormat.ShortDatePattern);
@@ -46,12 +51,12 @@ function EvaluateChanges()
     
         //MessageBox.Show("Check time R =" + receivedDate + "Closing =" + ClosedeDate +"RFQType=" + RFQType +"einde");
 
-        if(RFQType == "Standard" || RFQType == "Price Modification")
+        if(RFQType == "Standard" || RFQType == "Price Modification" || RFQType == "Breakdown")
         {
             if(receivedDate < ClosedeDate)
             {
-                Fields["7355322.16:Status"].Value = "On-time";
-                Fields["7355322.16:SAP Update"].Value = "3";
+                Fields["7355322.17:Status"].Value = "On-time";
+                Fields["7355322.17:SAP Update"].Value = "3";
             }
             else
             {
@@ -64,65 +69,64 @@ function EvaluateChanges()
                         //MessageBox.Show("Check time R =" + receivedHour + "Closing Time =" + ClosedHour +"einde");
                         if(receivedHour < ClosedHour)
                         {
-                            Fields["7355322.16:Status"].Value = "On-time";
-                            Fields["7355322.16:SAP Update"].Value = "3";
+                            Fields["7355322.17:Status"].Value = "On-time";
+                            Fields["7355322.17:SAP Update"].Value = "3";
                         }
                         else
                         {
-                            Fields["7355322.16:Status"].Value = "Late";
-                            Fields["7355322.16:SAP Update"].Value = "4";
+                            Fields["7355322.17:Status"].Value = "Late";
+                            Fields["7355322.17:SAP Update"].Value = "4";
                         }
                     }
                     catch (Ex)
                     {
                         //Make it late in cause their is something wrong with the time
-                        Fields["7355322.16:Status"].Value = "Late";
-                        Fields["7355322.16:SAP Update"].Value = "4";
+                        Fields["7355322.17:Status"].Value = "Late";
+                        Fields["7355322.17:SAP Update"].Value = "4";
                     }
                 }
                 else
                 {
-                    Fields["7355322.16:Status"].Value = "Late";
-                    Fields["7355322.16:SAP Update"].Value = "4";
+                    Fields["7355322.17:Status"].Value = "Late";
+                    Fields["7355322.17:SAP Update"].Value = "4";
                 }
             }
         }
 
         if(RFQType == "Breakdown")
         {
-            Fields["7355322.16:Status"].Value = "On-time";
-            Fields["7355322.16:SAP Update"].Value = "14";
+            Fields["7355322.17:SAP Update"].Value = "14";
         }
 	
         if(RFQType == "Recon")
         {
-            Fields["7355322.16:Status"].Value = "On-time";
-            Fields["7355322.16:SAP Update"].Value = "4";
+            Fields["7355322.17:Status"].Value = "On-time";
+            Fields["7355322.17:SAP Update"].Value = "4";
         }
 
         if(RFQType == "Invalid")
         {
-            Fields["7355322.16:Status"].Value = "";
-            Fields["7355322.16:SAP Update"].Value = "9";
+            Fields["7355322.17:Status"].Value = "";
+            Fields["7355322.17:SAP Update"].Value = "9";
         }
 
         if(RFQType == "Correspondence" || RFQType == "Other Modification")
         {
-            Fields["7355322.16:Status"].Value = "On-time";
-            Fields["7355322.16:SAP Update"].Value = "5";
+            Fields["7355322.17:Status"].Value = "On-time";
+            Fields["7355322.17:SAP Update"].Value = "5";
         }
 
-        if(Fields["7355322.16:Send to Buyer"].Value == "Yes")
+        if(Fields["7355322.17:Send to Buyer"].Value == "Yes")
         {
-            Fields["7355322.16:Status"].Value = "Review Required";
-            Fields["7355322.16:SAP Update"].Value = "90";
+            Fields["7355322.17:Status"].Value = "Review Required";
+            Fields["7355322.17:SAP Update"].Value = "90";
         }
 
-        Context["ReceivedDate"] = Fields["7355322.16:Received Date"].Value;
-        Context["ReceivedTime"] = Fields["7355322.16:Received Time"].Value;
-        Context["RFQType"] = Fields["7355322.16:Type of RFQ"].Value;
-        Context["SendToBuyer"] = Fields["7355322.16:Send to Buyer"].Value;
-        Context["UpdateInSap"] = Fields["7355322.16:SAP Update"].Value;
+        Context["ReceivedDate"] = Fields["7355322.17:Received Date"].Value;
+        Context["ReceivedTime"] = Fields["7355322.17:Received Time"].Value;
+        Context["RFQType"] = Fields["7355322.17:Type of RFQ"].Value;
+        Context["SendToBuyer"] = Fields["7355322.17:Send to Buyer"].Value;
+        Context["UpdateInSap"] = Fields["7355322.17:SAP Update"].Value;
     }
     catch (Exception)
     {
@@ -152,9 +156,9 @@ function UpdateTables()
         strIndex = Document["Index"];
         strFileName = strIndex.substring(0, strIndex.indexOf("#"));
         strUpdatedInSap = String(Context["UpdateInSap"]);
-        rfqNo = Document["Indexing:7355322.16:RFQ Number:0"];
-        src = Document["Indexing:7355322.16:Source:0"];
-        strRFQPrice = Document["Indexing:7355322.16:RFQ Amount:0"];
+        rfqNo = Document["Indexing:7355322.17:RFQ Number:0"];
+        src = Document["Indexing:7355322.17:Source:0"];
+        strRFQPrice = Document["Indexing:7355322.17:RFQ Amount:0"];
         conn.Open();
         cmd.Connection = conn;
         cmdUpd.Connection = conn;
@@ -220,20 +224,20 @@ function InitialiseRfQ(rfqNo, src)
         =====================================
         */
         Err = "Clear fields"
-        Fields["7355322.16:Collective Number"].Value = "";
-        Fields["7355322.16:Location No"].Value = "";
-        Fields["7355322.16:Location"].Value = "";
-        Fields["7355322.16:Closing Date"].Value = "";
-        Fields["7355322.16:Closing Time"].Value = "";
-        Fields["7355322.16:Vendor Number"].Value = "";
-        Fields["7355322.16:Vendor Name"].Value = "";
-        Fields["7355322.16:Source Detail"].Value = "";
-        Fields["7355322.16:Buyer No"].Value = "";
-        Fields["7355322.16:Buyer Name"].Value = "";
-        Fields["7355322.16:Send to Buyer"].Value = "No";
-        Fields["7355322.16:Scan Date"].Value = scandate;
-        Fields["7355322.16:Scan Pc"].Value = scanpc;
-        Fields["7355322.16:SAP Update"].Value = "0";
+        Fields["7355322.17:Collective Number"].Value = "";
+        Fields["7355322.17:Location No"].Value = "";
+        Fields["7355322.17:Location"].Value = "";
+        Fields["7355322.17:Closing Date"].Value = "";
+        Fields["7355322.17:Closing Time"].Value = "";
+        Fields["7355322.17:Vendor Number"].Value = "";
+        Fields["7355322.17:Vendor Name"].Value = "";
+        Fields["7355322.17:Source Detail"].Value = "";
+        Fields["7355322.17:Buyer No"].Value = "";
+        Fields["7355322.17:Buyer Name"].Value = "";
+        Fields["7355322.17:Send to Buyer"].Value = "No";
+        Fields["7355322.17:Scan Date"].Value = scandate;
+        Fields["7355322.17:Scan Pc"].Value = scanpc;
+        Fields["7355322.17:SAP Update"].Value = "0";
         Fields["HasMultiLines"].Value = false;
         Context["HasMultiLines"] = "0";
         /*
@@ -242,24 +246,24 @@ function InitialiseRfQ(rfqNo, src)
         =====================================
         */
         Err = "Set information fields readonly"
-        Fields["7355322.16:Collective Number"].ReadOnly = true;
-        Fields["7355322.16:Material Number"].ReadOnly = true;
-        Fields["7355322.16:Location No"].ReadOnly = true;
-        Fields["7355322.16:Location"].ReadOnly = true;
-        Fields["7355322.16:Closing Date"].ReadOnly = true;
-        Fields["7355322.16:Closing Time"].ReadOnly = true;
-        Fields["7355322.16:Vendor Number"].ReadOnly = true;
-        Fields["7355322.16:Vendor Name"].ReadOnly = true;
-        //Fields["7355322.16:Source"].ReadOnly = true;
-        Fields["7355322.16:Buyer No"].ReadOnly = true;
-        Fields["7355322.16:Buyer Name"].ReadOnly = true;
-        //Fields["7355322.16:Buyer e-mail"].ReadOnly = true;
-        Fields["7355322.16:Scan Pc"].ReadOnly = true;
-        Fields["7355322.16:Scan Date"].ReadOnly = true;
-        Fields["7355322.16:SAP Update"].ReadOnly = true;
-        Fields["7355322.16:Created Date"].ReadOnly = true;
+        Fields["7355322.17:Collective Number"].ReadOnly = true;
+        Fields["7355322.17:Material Number"].ReadOnly = true;
+        Fields["7355322.17:Location No"].ReadOnly = true;
+        Fields["7355322.17:Location"].ReadOnly = true;
+        Fields["7355322.17:Closing Date"].ReadOnly = true;
+        Fields["7355322.17:Closing Time"].ReadOnly = true;
+        Fields["7355322.17:Vendor Number"].ReadOnly = true;
+        Fields["7355322.17:Vendor Name"].ReadOnly = true;
+        //Fields["7355322.17:Source"].ReadOnly = true;
+        Fields["7355322.17:Buyer No"].ReadOnly = true;
+        Fields["7355322.17:Buyer Name"].ReadOnly = true;
+        //Fields["7355322.17:Buyer e-mail"].ReadOnly = true;
+        Fields["7355322.17:Scan Pc"].ReadOnly = true;
+        Fields["7355322.17:Scan Date"].ReadOnly = true;
+        Fields["7355322.17:SAP Update"].ReadOnly = true;
+        Fields["7355322.17:Created Date"].ReadOnly = true;
         Fields["Information"].ReadOnly = true;
-        //Fields["7355322.16:Status"].ReadOnly = true;
+        //Fields["7355322.17:Status"].ReadOnly = true;
         /*
         =====================================
          Set Information Fields Readonly
@@ -275,22 +279,22 @@ function InitialiseRfQ(rfqNo, src)
         if (rfqNo == "00")
         {
             Err = "Invalid RFQ"
-            Fields["7355322.16:Collective Number"].Value = "0000000000";
-            Fields["7355322.16:RFQ Number"].Value = "0000000000";
-            Fields["7355322.16:RFQ Amount"].Value = "0.00";
-            Fields["7355322.16:Received Date"].Value = TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now);
-            Fields["7355322.16:Received Time"].Value = TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString("HH:mm");
-            Fields["7355322.16:Location No"].Value = "IG01";
-            Fields["7355322.16:Location"].Value = "Corporate Office";
-            Fields["7355322.16:Closing Date"].Value = TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now);
-            Fields["7355322.16:Closing Time"].Value = TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString("HH:mm");
-            Fields["7355322.16:Type of RFQ"].Value = "Invalid";
-            Fields["7355322.16:Status"].Value = "Review Required";
-            Fields["7355322.16:SAP Update"].Value = "9";
-            Fields["7355322.16:Send to Buyer"].Value = "Yes";
-            Fields["7355322.16:Scan Date"].Value = scandate;
-            Fields["7355322.16:Scan Pc"].Value = scanpc;
-            //Fields["7355322.16:SAP Update"].Value = "0";
+            Fields["7355322.17:Collective Number"].Value = "0000000000";
+            Fields["7355322.17:RFQ Number"].Value = "0000000000";
+            Fields["7355322.17:RFQ Amount"].Value = "0.00";
+            Fields["7355322.17:Received Date"].Value = TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now);
+            Fields["7355322.17:Received Time"].Value = TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString("HH:mm");
+            Fields["7355322.17:Location No"].Value = "IG01";
+            Fields["7355322.17:Location"].Value = "Corporate Office";
+            Fields["7355322.17:Closing Date"].Value = TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now);
+            Fields["7355322.17:Closing Time"].Value = TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString("HH:mm");
+            Fields["7355322.17:Type of RFQ"].Value = "Invalid";
+            Fields["7355322.17:Status"].Value = "Review Required";
+            Fields["7355322.17:SAP Update"].Value = "9";
+            Fields["7355322.17:Send to Buyer"].Value = "Yes";
+            Fields["7355322.17:Scan Date"].Value = scandate;
+            Fields["7355322.17:Scan Pc"].Value = scanpc;
+            //Fields["7355322.17:SAP Update"].Value = "0";
 
             MessageBox.Show("This RFQ Response has been marked as Invalid.","Invalid RFQ Response")
         }
@@ -313,12 +317,12 @@ function InitialiseRfQ(rfqNo, src)
                 //strCreatedDate = strCreatedDate.replace("_", ":");
                 //strCreatedTime = strCreatedDate.substring(strCreatedDate.indexOf(" ") + 1);
                 //strFileName = strIndex.substring(0, strIndex.indexOf("#"));
-                //frmReceivedDate = Fields["7355322.16:Received Date"].Value;
+                //frmReceivedDate = Fields["7355322.17:Received Date"].Value;
 
                 //if(strCreatedDate != "")
                 //{
-                //    Fields["7355322.16:Created Date"].Value = strCreatedDate;
-                //    Fields["7355322.16:Created Date"].ReadOnly = true;
+                //    Fields["7355322.17:Created Date"].Value = strCreatedDate;
+                //    Fields["7355322.17:Created Date"].ReadOnly = true;
 
                 //    if(strCreatedDate == "")
                 //    {
@@ -327,16 +331,16 @@ function InitialiseRfQ(rfqNo, src)
                 //    }
                 //    else
                 //    {
-                //        Fields["7355322.16:Received Date"].Value = strCreatedDate;
-                //        Fields["7355322.16:Received Time"] = strCreatedTime;
+                //        Fields["7355322.17:Received Date"].Value = strCreatedDate;
+                //        Fields["7355322.17:Received Time"] = strCreatedTime;
                 //    }
                 //}
 
-                Fields["7355322.16:Created Date"].Value = scandate;
-                Fields["7355322.16:Created Date"].ReadOnly = true;
+                Fields["7355322.17:Created Date"].Value = scandate;
+                Fields["7355322.17:Created Date"].ReadOnly = true;
 
-                Fields["7355322.16:Received Date"].Value = scandate;
-                Fields["7355322.16:Received Time"] = scandate.ToString("HH:mm");
+                Fields["7355322.17:Received Date"].Value = scandate;
+                Fields["7355322.17:Received Time"] = scandate.ToString("HH:mm");
             }
             Err = "2"
 
@@ -348,23 +352,23 @@ function InitialiseRfQ(rfqNo, src)
                 dateTime1 = new DateTime(1970, 1, 1) + new TimeSpan(0, 0, seconds);
                 dateTime1 = TimeZone.CurrentTimeZone.ToLocalTime(dateTime1);
 
-                Fields["7355322.16:Created Date"].Value = dateTime1;
-                Fields["7355322.16:Created Date"].ReadOnly = true;
+                Fields["7355322.17:Created Date"].Value = dateTime1;
+                Fields["7355322.17:Created Date"].ReadOnly = true;
 
-                Fields["7355322.16:Received Date"].Value = dateTime1;
-                Fields["7355322.16:Received Time"] = dateTime1.ToString("HH:mm");
+                Fields["7355322.17:Received Date"].Value = dateTime1;
+                Fields["7355322.17:Received Time"] = dateTime1.ToString("HH:mm");
             }
 
             Err = "3"
             if(src == "Hand Delivery")
             {
-                //Fields["7355322.16:Received Date"].Value = "";
-                //Fields["7355322.16:Received Time"] = "";
-                Fields["7355322.16:Created Date"].Value = scandate;
-                Fields["7355322.16:Created Date"].ReadOnly = true;
+                //Fields["7355322.17:Received Date"].Value = "";
+                //Fields["7355322.17:Received Time"] = "";
+                Fields["7355322.17:Created Date"].Value = scandate;
+                Fields["7355322.17:Created Date"].ReadOnly = true;
 
-                Fields["7355322.16:Received Date"].Value = scandate;
-                Fields["7355322.16:Received Time"] = scandate.ToString("HH:mm");
+                Fields["7355322.17:Received Date"].Value = scandate;
+                Fields["7355322.17:Received Time"] = scandate.ToString("HH:mm");
             }
             Err = "4"
 
@@ -396,23 +400,23 @@ function InitialiseRfQ(rfqNo, src)
                 if (dr.Read())
                 {
                     Err = "10"
-                    if(dr["RFQ_GROUPNO"] != null){Fields["7355322.16:Collective Number"].Value = dr["RFQ_GROUPNO"];}
-                    if(dr["LOCATIONNO"] != null){Fields["7355322.16:Location No"].Value = dr["LOCATIONNO"];}
-                    if(dr["LOCATION"] != null){Fields["7355322.16:Location"].Value = dr["LOCATION"];}
-                    if(dr["CLOSINGDATE"] != null){Fields["7355322.16:Closing Date"].Value = dr["CLOSINGDATE"];}
-                    if(dr["OURREF"] != null){Fields["7355322.16:Closing Time"].Value = dr["OURREF"];}
-                    if(dr["VENDORNO"] != null){Fields["7355322.16:Vendor Number"].Value = dr["VENDORNO"];}
-                    if(dr["VENDORNAME"] != null){Fields["7355322.16:Vendor Name"].Value = dr["VENDORNAME"];}
-                    if(dr["BUYERNO"] != null){Fields["7355322.16:Buyer No"].Value = dr["BUYERNO"];}
-                    if(dr["BUYERNAME"] != null){Fields["7355322.16:Buyer Name"].Value = dr["BUYERNAME"];}
-                    if(dr["BUYEREMAIL"] != null){Fields["7355322.16:Buyer e-mail"].Value = dr["BUYEREMAIL"];}
-                    if(dr["PRICE"] != null && Fields["Rescan"].Value != "Yes"){Fields["7355322.16:RFQ Amount"].Value = dr["PRICE"];}
-                    if(dr["UPDATEDINSAP"] != null){Fields["7355322.16:SAP Update"].Value = dr["UPDATEDINSAP"];}
+                    if(dr["RFQ_GROUPNO"] != null){Fields["7355322.17:Collective Number"].Value = dr["RFQ_GROUPNO"];}
+                    if(dr["LOCATIONNO"] != null){Fields["7355322.17:Location No"].Value = dr["LOCATIONNO"];}
+                    if(dr["LOCATION"] != null){Fields["7355322.17:Location"].Value = dr["LOCATION"];}
+                    if(dr["CLOSINGDATE"] != null){Fields["7355322.17:Closing Date"].Value = dr["CLOSINGDATE"];}
+                    if(dr["OURREF"] != null){Fields["7355322.17:Closing Time"].Value = dr["OURREF"];}
+                    if(dr["VENDORNO"] != null){Fields["7355322.17:Vendor Number"].Value = dr["VENDORNO"];}
+                    if(dr["VENDORNAME"] != null){Fields["7355322.17:Vendor Name"].Value = dr["VENDORNAME"];}
+                    if(dr["BUYERNO"] != null){Fields["7355322.17:Buyer No"].Value = dr["BUYERNO"];}
+                    if(dr["BUYERNAME"] != null){Fields["7355322.17:Buyer Name"].Value = dr["BUYERNAME"];}
+                    if(dr["BUYEREMAIL"] != null){Fields["7355322.17:Buyer e-mail"].Value = dr["BUYEREMAIL"];}
+                    if(dr["PRICE"] != null && Fields["Rescan"].Value != "Yes"){Fields["7355322.17:RFQ Amount"].Value = dr["PRICE"];}
+                    if(dr["UPDATEDINSAP"] != null){Fields["7355322.17:SAP Update"].Value = dr["UPDATEDINSAP"];}
 				
                     Err = "11"
 				
                     myFormat = System.Threading.Thread.CurrentThread.CurrentCulture.DateTimeFormat; 
-                    var myDate	= Fields["7355322.16:Closing Date"].Value;
+                    var myDate	= Fields["7355322.17:Closing Date"].Value;
                     myDate = myDate.ToString(myFormat.ShortDatePattern);
                     Err = "11.1"
                     myDate = myDate.replace(/\//g, "-");
@@ -530,20 +534,20 @@ function InitialiseRfQ(rfqNo, src)
                     }
                     Err = "15"
                     //strInformation = "Closing Date: " + year + ":" + arr[1]  + " | " + strInformation + "Continue Scanning=No | ";
-                    strInformation = year + ":" + arr[1] + ":" + arr[2] + ":" + Fields["7355322.16:Collective Number"].Value;
+                    strInformation = year + ":" + arr[1] + ":" + arr[2] + ":" + Fields["7355322.17:Collective Number"].Value;
                     if(src == "Fax")
                     {
-                        if(dr["RETFAXNO"] != null){Fields["7355322.16:Source Detail"].Value = dr["RETFAXNO"];}
+                        if(dr["RETFAXNO"] != null){Fields["7355322.17:Source Detail"].Value = dr["RETFAXNO"];}
                     }
                     Err = "16"
                     if(src == "E-Mail")
                     {
                         var FAXLineGet = result["FAXLine"];
                         FAXLineGet = FAXLineGet.split('_')[1];
-                        Fields["7355322.16:Source Detail"].Value = FAXLineGet;
+                        Fields["7355322.17:Source Detail"].Value = FAXLineGet;
                     }
                     Err = "17"
-                    Fields["7355322.16:Type of RFQ"].Value = "Standard";
+                    Fields["7355322.17:Type of RFQ"].Value = "Standard";
 
                     /*
                     ===========================================
@@ -555,13 +559,13 @@ function InitialiseRfQ(rfqNo, src)
                     {
                         if(MessageBox.Show("Is this a breakdown RFQ?", "Breakdown Check", MessageBoxButtons.YesNo)==DialogResult.Yes)
                         {
-                            Fields["7355322.16:Type of RFQ"].Value = "Breakdown";
-                            Fields["7355322.16:Status"].Value = "On-time";
+                            Fields["7355322.17:Type of RFQ"].Value = "Breakdown";
+                            Fields["7355322.17:Status"].Value = "On-time";
                             RFQType = "Breakdown";
                         }
                         else
                         {
-                            Fields["7355322.16:Type of RFQ"].Value = "Standard";
+                            Fields["7355322.17:Type of RFQ"].Value = "Standard";
                             RFQType = "Standard";
                         }
                     }
@@ -574,7 +578,7 @@ function InitialiseRfQ(rfqNo, src)
                     if(dr["MATERIALNO"] != null)
                     {
                         materialnumber = dr["MATERIALNO"];
-                        Fields["7355322.16:Material Number"].Value = materialnumber;
+                        Fields["7355322.17:Material Number"].Value = materialnumber;
 			
                         if(RFQType != "Breakdown")
                         {
@@ -582,8 +586,8 @@ function InitialiseRfQ(rfqNo, src)
                             {
                                 if(MessageBox.Show("Is this a Recon?", "Recon Check", MessageBoxButtons.YesNo)==DialogResult.Yes)
                                 {
-                                    Fields["7355322.16:Type of RFQ"].Value = "Recon";
-                                    Fields["7355322.16:Status"].Value = "On-time";
+                                    Fields["7355322.17:Type of RFQ"].Value = "Recon";
+                                    Fields["7355322.17:Status"].Value = "On-time";
                                 }
                             }
                         }
