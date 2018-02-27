@@ -18,6 +18,7 @@ namespace COTEFM
             try
             {
                 classSAP.GetCOTEMPLOYEEList();
+                //Process.Start("http://www.google.com");
             }
             catch (Exception err)
             {

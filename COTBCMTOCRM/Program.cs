@@ -43,6 +43,23 @@ namespace COTBCMTOCRM
                 Console.WriteLine(errorMessage);
                 classStatic.AppendLog(errorMessage);
             }
+            try
+            {
+                //Get a list of all Guids for Service Requests that are not yet linked to ECC
+                CallList myCalls = new CallList(true);
+                foreach (Call myCall in myCalls)
+                {
+                    myCall.BCMStatus = "Completed - ECC Connected";
+                    classSAP.CallCOTAttachECC(myCall);
+                }
+            }
+            catch (Exception err)
+            {
+                //Write any Exceptions that may occur to the Log file
+                String errorMessage = "An unexpected error occurred: " + err.Message;
+                Console.WriteLine(errorMessage);
+                classStatic.AppendLog(errorMessage);
+            }
             classStatic.AppendLog("Application Ended on :" + DateTime.Now.ToString());
         }
     }

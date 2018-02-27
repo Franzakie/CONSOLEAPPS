@@ -102,7 +102,10 @@ CREATE OR REPLACE PROCEDURE OTCS.AMSA_VENDORUPDATE_U
                    ,v_VENDORNAME   IN NVARCHAR2
                    ,v_STATUS           IN NVARCHAR2
                    ,v_EMAIL              IN NVARCHAR2
-                   ,v_EXPIRYDATE     IN NVARCHAR2)
+                   ,v_EXPIRYDATE     IN NVARCHAR2
+                   ,v_TELEPHONE      IN NVARCHAR2
+                   ,v_FAX                 IN NVARCHAR2
+                   )
 AS
 TmpNewId Number;
 TmpRecExist Number;
@@ -110,16 +113,18 @@ BEGIN
             SELECT AMSA_VENDORUPDATE_SEC.NEXTVAL
             INTO TmpNewId
             FROM Dual;
-            INSERT INTO AMSA_VENDORUPDATE ("ID", DESCRIPTION, VENDOR_NO, EMAIL, CHARACTERISTIC, NOTICE_STATUS, EXPIRY_DATE, WF_INITIATED)
-            VALUES (TmpNewId, v_VENDORNAME, v_VENDOR_NO, v_EMAIL, v_CERTIFICATE, v_STATUS, v_EXPIRYDATE, 0);
+            INSERT INTO AMSA_VENDORUPDATE ("ID", DESCRIPTION, VENDOR_NO, EMAIL, CHARACTERISTIC, NOTICE_STATUS, EXPIRY_DATE, WF_INITIATED, TELEPHONE_NO, FAX_NO)
+            VALUES (TmpNewId, v_VENDORNAME, v_VENDOR_NO, v_EMAIL, v_CERTIFICATE, v_STATUS, v_EXPIRYDATE, 0, v_TELEPHONE, v_FAX);
             SELECT COUNT(*) INTO TmpRecExist FROM AMSA_VENDORINFO WHERE VENDOR_NO = v_VENDOR_NO;
             IF TmpRecExist = 0 THEN
-                    INSERT INTO AMSA_VENDORINFO (DESCRIPTION, VENDOR_NO, EMAIL)
-                    VALUES (v_VENDORNAME, v_VENDOR_NO, v_EMAIL);
+                    INSERT INTO AMSA_VENDORINFO (DESCRIPTION, VENDOR_NO, EMAIL, TELEPHONE_NO, FAX_NO)
+                    VALUES (v_VENDORNAME, v_VENDOR_NO, v_EMAIL, v_TELEPHONE, v_FAX);
             ELSE
                 UPDATE AMSA_VENDORINFO
                     SET DESCRIPTION = v_VENDORNAME, 
-                        EMAIL = v_EMAIL 
+                        EMAIL = v_EMAIL ,
+                        TELEPHONE_NO = v_TELEPHONE ,
+                        FAX_NO = v_FAX
                 WHERE VENDOR_NO = v_VENDOR_NO; 
             END IF;
   COMMIT;

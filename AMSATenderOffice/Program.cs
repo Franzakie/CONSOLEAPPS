@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BusinessClass;
 using BusinessClass.AMSA;
-using BusinessClass.List;
+using BusinessClass.AMSA.List;
 using BusinessClass.SAP;
 using BusinessClass.Static;
 using System.Diagnostics;
@@ -29,34 +29,37 @@ namespace AMSATenderOffice
                 Double dblTemp;
                 String resultString = "";
                 mylastRFQ.UpdateRFQStatusForPriceConsideration();
-                RFQList MyRFQList = new RFQList(); // Get a list where myRFQ.UpdatedInSap in (1,2); 
+                RFQList MyRFQList = RFQList.GetRFQList(); // Get a list where myRFQ.UpdatedInSap in (1,2); 
                 foreach(RFQ myRfq in MyRFQList)
                 {
-                    if (!String.IsNullOrEmpty(myRfq.RfqAmount))
+                    if ((!String.IsNullOrEmpty(myRfq.RfqAmount)) || (!String.IsNullOrEmpty(myRfq.LineAmount)))
                     {
-                        if (Double.TryParse(myRfq.RfqAmount, out dblTemp))
+                        if ((Double.TryParse(myRfq.RfqAmount, out dblTemp)) || (Double.TryParse(myRfq.LineAmount, out dblTemp)))
                         {
-                            resultString = classSAP.AMSAUpdateRFQ(myRfq.RfqNo, myRfq.RfqAmount);
-                            if (String.IsNullOrEmpty(resultString))
+                            resultString = classSAP.AMSAUpdateRFQ(myRfq);
+                            if (!resultString.Equals("X"))  //No valid price was actully updated inSAP
                             {
-                                myRfq.Status = "IN SAP";
-                                myRfq.UpdatedInSap = 5;
-                                myRfq.Save();
-                                classStatic.AppendLog(myRfq.RfqNo + "\t Uploaded successfully for closing date \t" + myRfq.ClosingDate.ToString());
-                                //}
-                            }
-                            else
-                            {
-                                if (resultString.Equals("FAILED"))
+                                if (String.IsNullOrEmpty(resultString))
                                 {
-                                    myRfq.UpdatedInSap = 8;  // Indicator that indicates that the record has failed to update in SAP
-                                    myRfq.Status = "SAP UPDATE FAILED";
-                                    myRfq.Save();
-                                    classStatic.AppendLog(myRfq.RfqNo + "\t has failed to update price in SAP for closing date \t" + myRfq.ClosingDate.ToString());
+                                    myRfq.Status = "IN SAP";
+                                    myRfq.UpdatedInSap = 5;
+                                    myRfq.SaveSAPStatus();
+                                    classStatic.AppendLog(myRfq.RfqNo + "\t Uploaded successfully for closing date \t" + myRfq.ClosingDate.ToString());
+                                    //}
                                 }
                                 else
                                 {
-                                    classStatic.AppendLog(myRfq.RfqNo + "\t has thrown some unexpected exception. \t" + myRfq.ClosingDate.ToString());
+                                    if (resultString.Equals("FAILED"))
+                                    {
+                                        myRfq.UpdatedInSap = 8;  // Indicator that indicates that the record has failed to update in SAP
+                                        myRfq.Status = "SAP UPDATE FAILED";
+                                        myRfq.SaveSAPStatus();
+                                        classStatic.AppendLog(myRfq.RfqNo + "\t has failed to update price in SAP for closing date \t" + myRfq.ClosingDate.ToString());
+                                    }
+                                    else
+                                    {
+                                        classStatic.AppendLog(myRfq.RfqNo + "\t has thrown some unexpected exception. \t" + myRfq.ClosingDate.ToString());
+                                    }
                                 }
                             }
                         }
@@ -101,6 +104,7 @@ namespace AMSATenderOffice
             }
             try
             {
+                //Download new RFQ numbers with the RFQ information from SAP
                 mylastRFQ.GetLastRFQ();
                 if (String.IsNullOrEmpty(mylastRFQ.RfqNo))
                 {
