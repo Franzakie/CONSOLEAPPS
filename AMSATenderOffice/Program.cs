@@ -11,6 +11,8 @@ using BusinessClass.Static;
 using System.Diagnostics;
 using System.Configuration;
 using BusinessClass.SAP.List;
+using BusinessClass.AMSA;
+using BusinessClass.AMSA.List;
 
 //Tender Office
 //Franz Seidel
@@ -32,34 +34,33 @@ namespace AMSATenderOffice
                 RFQList MyRFQList = RFQList.GetRFQList(); // Get a list where myRFQ.UpdatedInSap in (1,2); 
                 foreach(RFQ myRfq in MyRFQList)
                 {
-                    if ((!String.IsNullOrEmpty(myRfq.RfqAmount)) || (!String.IsNullOrEmpty(myRfq.LineAmount)))
+                    if ((!String.IsNullOrEmpty(myRfq.RfqAmount)))
                     {
-                        if ((Double.TryParse(myRfq.RfqAmount, out dblTemp)) || (Double.TryParse(myRfq.LineAmount, out dblTemp)))
+                        if (Double.TryParse(myRfq.RfqAmount, out dblTemp)) 
                         {
                             resultString = classSAP.AMSAUpdateRFQ(myRfq);
-                            if (!resultString.Equals("X"))  //No valid price was actully updated inSAP
+                            if (String.IsNullOrEmpty(resultString))
                             {
-                                if (String.IsNullOrEmpty(resultString))
+                                myRfq.Status = "IN SAP";
+                                myRfq.UpdatedInSap = 5;
+//                                    myRfq.SaveSAPStatus();
+                                myRfq.Save();
+                                classStatic.AppendLog(myRfq.RfqNo + "\t Uploaded successfully for closing date \t" + myRfq.ClosingDate.ToString());
+                                //}
+                            }
+                            else
+                            {
+                                if (resultString.Equals("FAILED"))
                                 {
-                                    myRfq.Status = "IN SAP";
-                                    myRfq.UpdatedInSap = 5;
-                                    myRfq.SaveSAPStatus();
-                                    classStatic.AppendLog(myRfq.RfqNo + "\t Uploaded successfully for closing date \t" + myRfq.ClosingDate.ToString());
-                                    //}
+                                    myRfq.UpdatedInSap = 8;  // Indicator that indicates that the record has failed to update in SAP
+                                    myRfq.Status = "SAP UPDATE FAILED";
+//                                        myRfq.SaveSAPStatus();
+                                    myRfq.Save();
+                                    classStatic.AppendLog(myRfq.RfqNo + "\t has failed to update price in SAP for closing date \t" + myRfq.ClosingDate.ToString());
                                 }
                                 else
                                 {
-                                    if (resultString.Equals("FAILED"))
-                                    {
-                                        myRfq.UpdatedInSap = 8;  // Indicator that indicates that the record has failed to update in SAP
-                                        myRfq.Status = "SAP UPDATE FAILED";
-                                        myRfq.SaveSAPStatus();
-                                        classStatic.AppendLog(myRfq.RfqNo + "\t has failed to update price in SAP for closing date \t" + myRfq.ClosingDate.ToString());
-                                    }
-                                    else
-                                    {
-                                        classStatic.AppendLog(myRfq.RfqNo + "\t has thrown some unexpected exception. \t" + myRfq.ClosingDate.ToString());
-                                    }
+                                    classStatic.AppendLog(myRfq.RfqNo + "\t has thrown some unexpected exception. \t" + myRfq.ClosingDate.ToString());
                                 }
                             }
                         }
